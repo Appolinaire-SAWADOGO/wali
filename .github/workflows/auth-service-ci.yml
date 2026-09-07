@@ -31,7 +31,7 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: ./mvnw -B verify
+        run: ./mvnw -B verify # git update-index --chmod=+x auth-service/mvnw pour autorise a executer mvnw
 
   docker:
     name: Build and Push Docker Image
