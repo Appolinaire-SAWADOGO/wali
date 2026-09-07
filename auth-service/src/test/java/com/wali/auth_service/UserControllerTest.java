@@ -2,9 +2,11 @@ package com.wali.auth_service;
 
 import com.wali.auth_service.Request.AuthRegisterRequest;
 import com.wali.auth_service.entities.UserEntity;
+import com.wali.auth_service.repository.UserRepository;
 import com.wali.auth_service.security.jwt.JwtTokenUtil;
 import com.wali.auth_service.services.kafka.KafkaProducerService;
 import com.wali.auth_service.services.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +36,13 @@ public class UserControllerTest {
     @MockitoBean
     private KafkaProducerService kafkaProducerService;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @BeforeEach
+    void cleanDatabase() {
+        userRepository.deleteAll();
+    }
 
     @Test
     void getUserById() throws Exception {
