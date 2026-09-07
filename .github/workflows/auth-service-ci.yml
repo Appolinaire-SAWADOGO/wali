@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'auth-service/**'
+      - 'backend/auth-service/**'
 
 env:
   # Use docker.io for Docker Hub if empty .
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: auth-service
+        working-directory: backend/auth-service
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,8 +62,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./auth-service
-          file: ./auth-service/Dockerfile
+          context: ./backend/auth-service
+          file: ./backend/auth-service/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

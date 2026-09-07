@@ -1,90 +1,118 @@
 # Wali
 
-**Wali** is an electronic wallet platform built on a **microservices** architecture.  
-It enables distributed management of users, wallets, transactions, and notifications.
+**Wali** is a digital wallet platform built with a **microservices architecture**.
 
-***
+The project provides services for authentication, wallet management, transactions, and notifications, with a frontend application used to interact with the platform.
+
+---
 
 ## Architecture
 
-Wali is developed using a **microservices** architecture primarily based on **Spring Boot**, **PostgreSQL**, and **Apache Kafka**.
+Wali is organized as a monorepo containing the backend microservices, frontend application, infrastructure, and CI/CD configuration.
 
 ```text
-                           ┌──────────────────┐
-                           │      Client      │
-                           └────────┬─────────┘
-                                    │
-                                    ▼
-                           ┌──────────────────┐
-                           │   API Gateway    │
-                           └────────┬─────────┘
-                                    │
-              ┌─────────────────────┼─────────────────────┐
-              │                     │                     │
-              ▼                     ▼                     ▼
-       ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-       │ Auth Service │      │Wallet Service│      │ Transaction  │
-       │    :8001     │      │    :8002     │      │   Service    │
-       └──────┬───────┘      └──────┬───────┘      │    :8003     │
-              │                     │              └──────┬───────┘
-              ▼                     ▼                     │
-        ┌───────────┐         ┌───────────┐               │
-        │PostgreSQL │         │PostgreSQL │               │
-        │ Auth DB   │         │ Wallet DB │               │
-        └───────────┘         └───────────┘               │
-                                                          │
-                                                          ▼
-                                                   ┌─────────────┐
-                                                   │    Kafka    │
-                                                   └──────┬──────┘
-                                                          │
-                                                          ▼
-                                               ┌──────────────────┐
-                                               │Notification      │
-                                               │Service :8004     │
-                                               └────────┬─────────┘
-                                                        │
-                                                        ▼
-                                                  ┌───────────┐
-                                                  │PostgreSQL │
-                                                  │Notification│
-                                                  └───────────┘
+                           ┌──────────────┐
+                           │   Frontend   │
+                           └──────┬───────┘
+                                  │
+                                  ▼
+                         ┌────────────────┐
+                         │  API Gateway   │
+                         └───────┬────────┘
+                                 │
+              ┌──────────────────┼──────────────────┐
+              │                  │                  │
+              ▼                  ▼                  ▼
+       ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+       │Auth Service │    │Wallet       │    │Transaction  │
+       │             │    │Service      │    │Service      │
+       └─────────────┘    └─────────────┘    └─────────────┘
+              │                  │                  │
+              └──────────────────┼──────────────────┘
+                                 │
+                                 ▼
+                            ┌──────────┐
+                            │  Kafka   │
+                            └────┬─────┘
+                                 │
+                                 ▼
+                         ┌─────────────────┐
+                         │ Notification    │
+                         │ Service         │
+                         └─────────────────┘
 ```
 
-***
+---
 
-## Microservices
+## Project Structure
 
-| Service                |   Port | Responsibility                                              |
-| ---------------------- | -----: | ----------------------------------------------------------- |
-| `auth-service`         | `8001` | Authentication, registration, and user management           |
-| `wallet-service`       | `8002` | Wallet and balance management                               |
-| `transaction-service`  | `8003` | Transaction creation and processing                         |
-| `notification-service` | `8004` | Notification management and delivery                        |
+```text
+wali/
+│
+├── backend/
+│   ├── api-gateway/
+│   ├── auth-service/
+│   ├── wallet-service/
+│   ├── transaction-service/
+│   └── notification-service/
+│
+├── frontend/
+│
+├── infrastructure/
+│   ├── terraform/
+│   └── kubernetes/
+│
+├── asset/
+│
+├── .github/
+│   └── workflows/
+│
+├── .gitignore
+├── qodana.yaml
+└── README.md
+```
 
-Each microservice has its own database to comply with the **Database per Service** principle.
+---
 
-***
+## Backend
+
+The backend is composed of several independent microservices:
+
+| Service                | Description                        |
+| ---------------------- | ---------------------------------- |
+| `api-gateway`          | Entry point for client requests    |
+| `auth-service`         | Authentication and user management |
+| `wallet-service`       | Wallet and balance management      |
+| `transaction-service`  | Transaction management             |
+| `notification-service` | Notification management            |
+
+Each microservice is designed to be independently developed, tested, built, and deployed.
+
+---
+
+## Frontend
+
+The `frontend/` directory contains the client application used to interact with the Wali platform.
+
+The frontend communicates with the backend through the **API Gateway**.
+
+---
 
 ## Technologies
 
 ### Backend
 
-* Java 17
+* Java
 * Spring Boot
 * Spring Security
 * JWT
-* Spring Data JPA / Hibernate
-* Apache Kafka
+* Spring Data JPA
 * PostgreSQL
+* Apache Kafka
 
-### Testing
+### Frontend
 
-* JUnit
-* Mockito
-* Spring Boot Test
-* MockMvc
-* H2
+* React / React Native
 
 ### DevOps
 
@@ -94,199 +122,114 @@ Each microservice has its own database to comply with the **Database per Service
 * Terraform
 * Kubernetes
 
-### Observability
+### Monitoring
 
 * Prometheus
 * Grafana
 * Loki
 
-***
+---
 
-## Inter-Service Communication
-
-Microservices communicate primarily in an **asynchronous** manner via Apache Kafka.
-
-### Kafka Topics
-
-```text
-user-created
-transaction-created
-transaction-success
-transaction-failed
-```
-
-Example of transaction processing:
-
-```text
-Client
-  │
-  ▼
-Transaction Service
-  │
-  │ transaction-created
-  ▼
-Kafka
-  │
-  ▼
-Wallet Service
-  │
-  ├── Debit sender wallet
-  │
-  └── Credit recipient wallet
-  │
-  ▼
-transaction-success
-  │
-  ▼
-Notification Service
-```
-
-***
-
-## Security
-
-Authentication is based on **JWT**.
-
-The general flow is:
-
-```text
-Login
-  │
-  ▼
-Auth Service
-  │
-  ▼
-Access Token
-  │
-  ▼
-Client
-  │
-  │ Authorization: Bearer <token>
-  ▼
-Microservices
-```
-
-Secrets and sensitive information must never be committed to Git.
-
-Examples:
-
-```text
-JWT secrets
-Database passwords
-Kafka credentials
-API keys
-Cloud credentials
-```
-
-Instead, use environment variables or secrets managed by the deployment environment.
-
-***
-
-## Running with Docker
+## Getting Started
 
 ### Prerequisites
 
+Make sure you have installed:
+
+* Git
+* Java 17
+* Maven
+* Node.js
 * Docker
 * Docker Compose
 
-### Start the Entire Project
+Depending on the part of the project you want to run, additional dependencies may be required.
 
-From the root directory:
+---
+
+## Clone the Repository
+
+```bash
+git clone <repository-url>
+cd wali
+```
+
+---
+
+## Start the Backend
+
+Each backend service is an independent Spring Boot application.
+
+For example:
+
+```bash
+cd backend/auth-service
+./mvnw spring-boot:run
+```
+
+On Windows:
+
+```powershell
+cd backend/auth-service
+.\mvnw.cmd spring-boot:run
+```
+
+The same approach can be used for the other services:
+
+```text
+backend/
+├── api-gateway/
+├── auth-service/
+├── wallet-service/
+├── transaction-service/
+└── notification-service/
+```
+
+---
+
+## Start the Frontend
+
+Go to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Then start the application using the command defined by the frontend project.
+
+For example:
+
+```bash
+npm run dev
+```
+
+---
+
+## Start with Docker
+
+If a Docker Compose configuration is provided at the root of the project:
 
 ```bash
 docker compose up --build
 ```
 
-### Stop the Services
+To stop the containers:
 
 ```bash
 docker compose down
 ```
 
-### Stop and Remove Volumes
-
-```bash
-docker compose down -v
-```
-
-***
-
-## Testing
-
-Each microservice has its own tests.
-
-Example:
-
-```bash
-cd auth-service
-./mvnw test
-```
-
-```bash
-cd wallet-service
-./mvnw test
-```
-
-```bash
-cd transaction-service
-./mvnw test
-```
-
-```bash
-cd notification-service
-./mvnw test
-```
-
-Or, from the root, tests for all services can be run via the CI pipeline.
-
-***
-
-## CI/CD
-
-The project uses **GitHub Actions** to automate verification and deployment.
-
-Planned pipeline:
-
-```text
-git push
-   │
-   ▼
-GitHub Actions
-   │
-   ├── Tests
-   ├── Build
-   ├── Docker Build
-   └── Docker Push
-          │
-          ▼
-      Kubernetes
-          │
-          ▼
-       Deploy
-```
-
-***
+---
 
 ## Infrastructure
 
-Infrastructure is managed with **Terraform**, and applications are deployed on **Kubernetes**.
-
-```text
-Terraform
-    │
-    ▼
-Cloud Infrastructure
-    │
-    ▼
-Kubernetes Cluster
-    │
-    ├── auth-service
-    ├── wallet-service
-    ├── transaction-service
-    └── notification-service
-```
-
-Infrastructure files are available in:
+The `infrastructure/` directory contains the configuration used to provision and deploy the platform.
 
 ```text
 infrastructure/
@@ -294,92 +237,51 @@ infrastructure/
 └── kubernetes/
 ```
 
-***
+Terraform is used for infrastructure provisioning, while Kubernetes is used to manage application deployments.
 
-## Observability
+---
 
-The production environment includes an observability stack based on:
+## CI/CD
 
-```text
-Applications
-     │
-     ├──────────────► Prometheus ──────► Grafana
-     │                    metrics
-     │
-     └──────────────► Loki ────────────► Grafana
-                          logs
-```
+GitHub Actions is used to automate the development workflow.
 
-This will enable monitoring of:
-
-* CPU and memory
-* Number of requests
-* HTTP latency
-* HTTP errors
-* Kafka errors
-* Application logs
-* JVM metrics
-* Microservice health
-
-***
-
-## Repository Structure
+The CI/CD pipelines can perform tasks such as:
 
 ```text
-wali/
-│
-├── auth-service/
-│   ├── src/
-│   ├── pom.xml
-│   └── Dockerfile
-│
-├── wallet-service/
-│   ├── src/
-│   ├── pom.xml
-│   └── Dockerfile
-│
-├── transaction-service/
-│   ├── src/
-│   ├── pom.xml
-│   └── Dockerfile
-│
-├── notification-service/
-│   ├── src/
-│   ├── pom.xml
-│   └── Dockerfile
-│
-├── infrastructure/
-│   ├── terraform/
-│   └── kubernetes/
-│
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── cd.yml
-│
-├── docker-compose.yml
-├── .gitignore
-└── README.md
+Push / Pull Request
+        │
+        ▼
+   GitHub Actions
+        │
+        ├── Test
+        ├── Build
+        ├── Docker Image
+        └── Deployment
 ```
 
-***
+Workflow files are located in:
 
-## Project Objectives
+```text
+.github/workflows/
+```
 
-* Design a robust microservices architecture
-* Implement asynchronous communication with Kafka
-* Separate databases per service
-* Secure APIs with JWT
-* Containerize services with Docker
-* Automate testing and deployments with GitHub Actions
-* Provision infrastructure with Terraform
-* Deploy microservices with Kubernetes
-* Set up a complete observability solution with Grafana, Prometheus, and Loki
-
-***
+---
 
 ## Development
 
-The project is organized as a **monorepo** to centralize the code for the different microservices, along with their infrastructure and DevOps configuration.
+Wali follows a **monorepo** approach.
 
-However, each service remains **independent in terms of its code, database, and deployment**.
+The repository contains:
+
+* Backend microservices
+* Frontend application
+* Infrastructure
+* CI/CD configuration
+
+Although they are stored in the same repository, backend services remain independent and can be developed, tested, built, and deployed separately.
+
+---
+
+## License
+
+This project is currently under development.
