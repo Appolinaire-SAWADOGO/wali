@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: wali-wallet-service-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: wali-wallet-service-db-user
+      POSTGRES_PASSWORD: x5y*N+lmkHOK&KVJ
+      POSTGRES_DB: wali-wallet-service-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data+
+volumes:
+  postgres_data:
+    driver: local
