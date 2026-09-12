@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wali-kafka
-          image: bitnami/kafka:3.6.1
+          image: apache/kafka:3.9.0
           ports:
             - containerPort: 9092
             - containerPort: 9093
