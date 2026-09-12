@@ -29,6 +29,13 @@ spec:
               value: wali-transaction-service-db-user
             - name: POSTGRES_DB
               value: wali-transaction-service-db
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
   volumeClaimTemplates:
     - metadata:
         name: postgres-storage

@@ -5,7 +5,7 @@ metadata:
   labels:
     app: wali-transaction-service
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: wali-transaction-service
@@ -37,3 +37,10 @@ spec:
               value: wali-kafka.default.svc.cluster.local:9092
             - name: DB_USER
               value: wali-transaction-service-db-user
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

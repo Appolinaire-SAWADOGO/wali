@@ -41,6 +41,13 @@ spec:
               value: "yes"
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: "true"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
           volumeMounts:
             - name: kafka-storage
               mountPath: /bitnami/kafka
