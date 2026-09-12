@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:latest
-    container_name: wali-transaction-service-postgres
+    container_name: wali-transaction-service-db
     restart: always
     environment:
       POSTGRES_USER: wali-transaction-service-db-user

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wali-transaction-service-db
+spec:
+  serviceName: wali-transaction-service-db
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: wali-transaction-service-db
+  template:
+    metadata:
+      labels:
+        app: wali-transaction-service-db
+    spec:
+      containers:
+        - name: wali-transaction-service-db
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wali-transaction-service-db-password
+                  key: DB_PASSWORD
+            - name: POSTGRES_USER
+              value: wali-transaction-service-db-user
+            - name: POSTGRES_DB
+              value: wali-transaction-service-db
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 5Gi

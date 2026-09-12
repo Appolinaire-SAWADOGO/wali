@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wali-wallet-service
+  labels:
+    app: wali-wallet-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wali-wallet-service
+  template:
+    metadata:
+      labels:
+        app: wali-wallet-service
+    spec:
+      containers:
+        - name: wali-wallet-service
+          image: 08072005/wali-wallet-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: "jdbc:postgresql://wali-wallet-service-db.default.svc.cluster.local:5432/wali-wallet-service-db"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wali-wallet-service-db-password
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wali-jwt-secret
+                  key: JWT_SECRET
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: wali-kafka.default.svc.cluster.local:9092
+            - name: DB_USER
+              value: wali-wallet-service-db-user

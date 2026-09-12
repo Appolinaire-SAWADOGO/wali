@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wali-auth-service-db
+  labels:
+    app: wali-auth-service-db
+spec:
+  clusterIP: None
+  selector:
+    app: wali-auth-service-db
+  ports:
+      port: 5432
+      targetPort: 5432

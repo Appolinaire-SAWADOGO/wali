@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wali-notification-service-db
+spec:
+  serviceName: wali-notification-service-db
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: wali-notification-service-db
+  template:
+    metadata:
+      labels:
+        app: wali-notification-service-db
+    spec:
+      containers:
+        - name: wali-notification-service-db
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wali-notification-service-db-password
+                  key: DB_PASSWORD
+            - name: POSTGRES_USER
+              value: wali-notification-service-db-user
+            - name: POSTGRES_DB
+              value: wali-notification-service-db
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 5Gi

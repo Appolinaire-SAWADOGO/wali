@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wali-api-gateway
+  labels:
+    app: wali-api-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wali-api-gateway
+  template:
+    metadata:
+      labels:
+        app: wali-api-gateway
+    spec:
+      containers:
+        - name: wali-api-gateway
+          image: 08072005/wali-api-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AUTH_SERVICE_URL
+              value: "wali-auth-service.default.svc.cluster.local:8080"
+            - name: WALLET_SERVICE_URL
+              value: "wali-wallet-service.default.svc.cluster.local:8080"
+            - name: TRANSACTION_SERVICE_URL
+              value: "wali-transaction-service.default.svc.cluster.local:8080"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "wali-notification-service.default.svc.cluster.local:8080"
