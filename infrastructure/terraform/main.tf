@@ -207,9 +207,68 @@ resource "aws_route_table_association" "public_b" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+# ============================================================
+# 11. NAT GATEWAY (pour donner internet aux subnets privés)
+# ============================================================
+
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags = {
+    Name = "wali-nat-eip"
+  }
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_a.id
+
+  tags = {
+    Name = "wali-nat-gw"
+  }
+
+  depends_on = [aws_internet_gateway.igw]
+}
 
 # ============================================================
-# 11. EKS
+# 12. ROUTE TABLE PRIVATE
+# ============================================================
+
+# Une route table contient les règles qui déterminent où le trafic
+# réseau doit être envoyé.
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat.id
+  }
+
+  tags = {
+    Name = "wali-private-route-table"
+  }
+}
+
+# ============================================================
+# 13. ASSOCIATION ROUTE TABLE → PRIVATE SUBNET A
+# ============================================================
+
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+# ============================================================
+# 14. ASSOCIATION ROUTE TABLE → PRIVATE SUBNET B
+# ============================================================
+
+resource "aws_route_table_association" "private_b" {
+  subnet_id      = aws_subnet.private_b.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+# ============================================================
+# 15. EKS
 # ============================================================
 
 # Ici nous utilisons un module Terraform officiel/populaire
@@ -274,7 +333,7 @@ module "eks" {
 
 
 # ============================================================
-# 12. ROUTE 53
+# 16. ROUTE 53
 # ============================================================
 
 # ATTENTION :
