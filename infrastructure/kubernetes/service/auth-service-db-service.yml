@@ -5,9 +5,9 @@ metadata:
   labels:
     app: wali-auth-service-db
 spec:
-  clusterIP: None
+  clusterIP: None # chaque pod a une ip seul alors que sans cluster ip il y'a une adresse seul (utulil pour les statefulset comme les db) pour tout les pods de mmaniere dynamique
   selector:
     app: wali-auth-service-db
   ports:
-      port: 5432
-      targetPort: 5432
+      - port: 5432
+        targetPort: 5432

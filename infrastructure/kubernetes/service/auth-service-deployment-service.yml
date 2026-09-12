@@ -5,9 +5,8 @@ metadata:
   labels:
     app: wali-auth-service
 spec:
-  clusterIP: None
   selector:
     app: wali-auth-service
   ports:
-      port: 8080
-      targetPort: 8080
+      - port: 8080
+        targetPort: 8080
