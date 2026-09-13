@@ -68,8 +68,6 @@ public class WalletService implements IWalletService {
 
         TransactionResponse transactionResponse = transactionRequestToTransactionResponse(
                 transactionRequest);
-        String message = jsonMapper.writeValueAsString(transactionResponse);
-
 
         if(transactionRequest.getStatus() != TransactionStatus.PENDING){
             log.warn("Transaction id={} status is not PENDING",
@@ -85,7 +83,10 @@ public class WalletService implements IWalletService {
                             transactionRequest.getSenderWalletId());
 
                     transactionResponse.setStatus(TransactionStatus.FAILED);
-                    kafkaProducerService.sendMessage("transaction-processed", message );
+
+                    kafkaProducerService.sendMessage("transaction-processed",
+                            jsonMapper.writeValueAsString(transactionResponse) );
+
                     log.debug("'transaction-processed' topic sent for transactionId={}", transactionRequest.getId() );
 
                     throw new WalletNotFoundException("Wallet for senderWalletId=" + transactionRequest.getSenderWalletId() + " not found");
@@ -97,7 +98,7 @@ public class WalletService implements IWalletService {
                             transactionRequest.getReceiverWalletId());
 
                     transactionResponse.setStatus(TransactionStatus.FAILED);
-                    kafkaProducerService.sendMessage("transaction-processed",message );
+                    kafkaProducerService.sendMessage("transaction-processed", jsonMapper.writeValueAsString(transactionResponse) );
                     log.debug("'transaction-processed' topic sent for transactionId={}", transactionRequest.getId() );
 
                     throw new WalletNotFoundException("Wallet for receiverWalletId=" + transactionRequest.getReceiverWalletId() + " not found");
@@ -111,7 +112,7 @@ public class WalletService implements IWalletService {
                     );
 
                     transactionResponse.setStatus(TransactionStatus.FAILED);
-                    kafkaProducerService.sendMessage("transaction-processed", message );
+                    kafkaProducerService.sendMessage("transaction-processed", jsonMapper.writeValueAsString(transactionResponse) );
                     log.debug("'transaction-processed' topic sent for transactionId={}", transactionRequest.getId() );
                     return;
                 }
@@ -122,7 +123,7 @@ public class WalletService implements IWalletService {
         walletRepository.updateWalletBalanceByWalletId(receiverWalletEntity.getId(), transactionRequest.getAmount());
 
         transactionResponse.setStatus(TransactionStatus.CONFIRMED);
-        kafkaProducerService.sendMessage("transaction-processed", message);
+        kafkaProducerService.sendMessage("transaction-processed", jsonMapper.writeValueAsString(transactionResponse));
         log.debug("'transaction-processed' topic sent for transactionId={}", transactionRequest.getId() );
 
         log.debug("process transaction success for senderWalletId={} and receiverWalletId={}",
@@ -166,6 +167,7 @@ public class WalletService implements IWalletService {
                 .senderWalletId(transactionRequest.getSenderWalletId())
                 .receiverWalletId(transactionRequest.getReceiverWalletId())
                 .amount(transactionRequest.getAmount())
+                .type(transactionRequest.getType())
                 .createdAt(transactionRequest.getCreatedAt())
                 .build();
 
