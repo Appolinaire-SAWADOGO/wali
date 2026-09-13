@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wali-kafka
-          image: apache/kafka:3.9.0
+          image: apache/kafka:latest
           ports:
             - containerPort: 9092
             - containerPort: 9093

@@ -41,7 +41,7 @@
           name: postgres-storage
         spec:
           accessModes: [ "ReadWriteOnce" ]
-          storageClassName: gp2
+          storageClassName: ebs-gp3-auto
           resources:
             requests:
               storage: 5Gi
