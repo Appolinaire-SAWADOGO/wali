@@ -35,3 +35,18 @@ spring:
                 - Path=/api/notification/**
               filters:
                 - StripPrefix=1
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Auth Service
+        url: /api/auth/v3/api-docs
+
+      - name: Wallet Service
+        url: /api/wallet/v3/api-docs
+
+      - name: Transaction Service
+        url: /api/transaction/v3/api-docs
+
+      - name: Notification Service
+        url: /api/notification/v3/api-docs
