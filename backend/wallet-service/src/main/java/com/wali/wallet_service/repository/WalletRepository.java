@@ -22,6 +22,6 @@ public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
     boolean existsByUserId(UUID userId);
 
     @Modifying
-    @Query("UPDATE WalletEntity e SET e.balance = :balance WHERE e.id = :walletId")
+    @Query("UPDATE WalletEntity e SET e.balance = e.balance + :balance WHERE e.id = :walletId")
     void  updateWalletBalanceByWalletId(UUID walletId, BigDecimal balance);
 }
