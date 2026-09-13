@@ -8,6 +8,44 @@ spring:
       server:
         webflux:
           routes:
+
+            # =========================
+            # SWAGGER / OPENAPI
+            # =========================
+
+            - id: auth-service-swagger
+              uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/v3/api-docs
+              filters:
+                - RewritePath=/api/auth/v3/api-docs, /v3/api-docs
+
+            - id: wallet-service-swagger
+              uri: ${WALLET_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/wallet/v3/api-docs
+              filters:
+                - RewritePath=/api/wallet/v3/api-docs, /v3/api-docs
+
+            - id: transaction-service-swagger
+              uri: ${TRANSACTION_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/transaction/v3/api-docs
+              filters:
+                - RewritePath=/api/transaction/v3/api-docs, /v3/api-docs
+
+            - id: notification-service-swagger
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/notification/v3/api-docs
+              filters:
+                - RewritePath=/api/notification/v3/api-docs, /v3/api-docs
+
+
+            # =========================
+            # SERVICES
+            # =========================
+
             - id: auth-service
               uri: ${AUTH_SERVICE_URL:http://localhost:8081}
               predicates:
@@ -36,8 +74,16 @@ spring:
               filters:
                 - StripPrefix=1
 
+
 springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
   swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
     urls:
       - name: Auth Service
         url: /api/auth/v3/api-docs
