@@ -2,6 +2,7 @@ package com.wali.wallet_service.repository;
 
 import com.wali.wallet_service.entities.WalletEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,7 @@ public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
 
     boolean existsByUserId(UUID userId);
 
+    @Modifying
     @Query("UPDATE WalletEntity e SET e.balance = :balance WHERE e.id = :walletId")
     void  updateWalletBalanceByWalletId(UUID walletId, BigDecimal balance);
 }
