@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>wali — console de test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --paper: #FAF8F4;
+    --paper-dim: #F1EDE5;
+    --ink: #1A2332;
+    --ink-soft: #5B6472;
+    --line: #DED8CB;
+    --amber: #D4923A;
+    --amber-deep: #B87526;
+    --red: #B14343;
+    --green: #3D7A4E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Space Grotesk', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #root { min-height: 100vh; }
+
+  .shell {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  /* ---- Auth screen ---- */
+  .auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 380px;
+  }
+  .wordmark {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--amber-deep);
+    margin-bottom: 6px;
+  }
+  .auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 28px;
+    line-height: 1.15;
+  }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px 0;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--amber);
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(212,146,58,0.15);
+  }
+  .btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 0;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .btn:hover { background: #2B3648; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .btn-secondary:hover { border-color: var(--ink); background: none; }
+  .err {
+    font-size: 13px;
+    color: var(--red);
+    margin: -8px 0 16px;
+  }
+
+  /* ---- Dashboard ---- */
+  .topbar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .topbar .who { font-size: 13px; color: var(--ink-soft); }
+  .topbar button {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  section { margin-bottom: 44px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .refresh {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--amber-deep);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .balance-block {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 22px 0;
+  }
+  .balance-num {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .balance-currency {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-left: 6px;
+  }
+  .wallet-id {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  .tx-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .type-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .type-btn {
+    flex: 1;
+    padding: 9px 0;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .type-btn.active {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--paper-dim);
+  }
+  .row2 { display: flex; gap: 10px; }
+  .row2 > div { flex: 1; }
+
+  .ledger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .ledger-row:first-child { border-top: 1px solid var(--line); }
+  .ledger-left { display: flex; flex-direction: column; gap: 2px; }
+  .ledger-type { font-weight: 500; }
+  .ledger-date { font-size: 12px; color: var(--ink-soft); }
+  .ledger-right { display: flex; align-items: center; gap: 10px; }
+  .ledger-amount { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .status-pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .status-CONFIRMED { color: var(--green); background: rgba(61,122,78,0.12); }
+  .status-PENDING { color: var(--amber-deep); background: rgba(212,146,58,0.14); }
+  .status-FAILED { color: var(--red); background: rgba(177,67,67,0.12); }
+
+  .notif-row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .notif-row:first-child { border-top: 1px solid var(--line); }
+  .notif-title { font-size: 14px; font-weight: 600; }
+  .notif-body { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .notif-date { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  .empty {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    padding: 16px 0;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  }
+  .toast.error { background: var(--red); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+const API_BASE = "http://localhost:8080/api";
+
+function authHeaders(token) {
+  return token ? { "Authorization": "Bearer " + token } : {};
+}
+
+async function api(path, { method = "GET", token, body } = {}) {
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders(token),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  let payload = null;
+  try { payload = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    const msg = (payload && (payload.message || payload.error)) || `Erreur ${res.status}`;
+    throw new Error(msg);
+  }
+  return payload;
+}
+
+function Toast({ toast }) {
+  if (!toast) return null;
+  return (
+    <div className={"toast" + (toast.type === "error" ? " error" : "")}>
+      {toast.text}
+    </div>
+  );
+}
+
+function AuthScreen({ onAuthed, setToast }) {
+  const [mode, setMode] = useState("login"); // login | register
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setErr("");
+    setBusy(true);
+    try {
+      const path = mode === "login" ? "/auth/login" : "/auth/register";
+      const body = mode === "login" ? { email, password } : { userName, email, password };
+      const res = await api(path, { method: "POST", body });
+      if (!res.accessToken) throw new Error(res.message || "Échec de l'authentification");
+      onAuthed({ token: res.accessToken, userId: res.data && res.data.id });
+      setToast({ text: mode === "login" ? "Connecté" : "Compte créé", type: "ok" });
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="auth-wrap">
+      <div className="auth-card">
+        <div className="wordmark">wali</div>
+        <h1 className="auth-title">
+          {mode === "login" ? "Accédez à votre portefeuille" : "Créez votre portefeuille"}
+        </h1>
+
+        <div className="tabs">
+          <button className={"tab" + (mode === "login" ? " active" : "")} onClick={() => { setMode("login"); setErr(""); }}>
+            Connexion
+          </button>
+          <button className={"tab" + (mode === "register" ? " active" : "")} onClick={() => { setMode("register"); setErr(""); }}>
+            Inscription
+          </button>
+        </div>
+
+        <form onSubmit={submit}>
+          {mode === "register" && (
+            <div className="field">
+              <label>Nom d'utilisateur</label>
+              <input value={userName} onChange={e => setUserName(e.target.value)}
+                minLength={3} maxLength={50} required />
+            </div>
+          )}
+          <div className="field">
+            <label>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              maxLength={254} required />
+          </div>
+          <div className="field">
+            <label>Mot de passe</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              minLength={8} maxLength={16} required />
+          </div>
+          {err && <div className="err">{err}</div>}
+          <button className="btn" disabled={busy}>
+            {busy ? "Un instant…" : mode === "login" ? "Se connecter" : "Créer le compte"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({ session, onLogout, setToast }) {
+  const { token, userId } = session;
+  const [wallet, setWallet] = useState(null);
+  const [txs, setTxs] = useState([]);
+  const [notifs, setNotifs] = useState([]);
+  const [loadingWallet, setLoadingWallet] = useState(true);
+
+  const [txType, setTxType] = useState("DEPOSIT");
+  const [amount, setAmount] = useState("");
+  const [receiverId, setReceiverId] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const loadWallet = useCallback(async () => {
+    setLoadingWallet(true);
+    try {
+      const res = await api(`/wallet/user/${userId}`, { token });
+      setWallet(res.data);
+    } catch (e) {
+      setToast({ text: e.message, type: "error" });
+    } finally {
+      setLoadingWallet(false);
+    }
+  }, [userId, token]);
+
+  const loadTxs = useCallback(async (walletId) => {
+    if (!walletId) return;
+    try {
+      const res = await api(`/transaction/walletId/${walletId}`, { token });
+      setTxs(res.data || []);
+    } catch (e) {
+      setToast({ text: e.message, type: "error" });
+    }
+  }, [token]);
+
+  const loadNotifs = useCallback(async (walletId) => {
+    if (!walletId) return;
+    try {
+      const res = await api(`/notification/walletId/${walletId}`, { token });
+      setNotifs(res.data || []);
+    } catch (e) {
+      setToast({ text: e.message, type: "error" });
+    }
+  }, [token]);
+
+  useEffect(() => { loadWallet(); }, [loadWallet]);
+  useEffect(() => {
+    if (wallet && wallet.id) {
+      loadTxs(wallet.id);
+      loadNotifs(wallet.id);
+    }
+  }, [wallet, loadTxs, loadNotifs]);
+
+  const submitTx = async (e) => {
+    e.preventDefault();
+    if (!wallet) return;
+    setSending(true);
+    try {
+      const body = {
+        amount: parseFloat(amount),
+        type: txType,
+        senderWalletId: wallet.id,
+        receiverWalletId: txType === "DEPOSIT" ? wallet.id : receiverId,
+      };
+      await api("/transaction", { method: "POST", token, body });
+      setToast({ text: "Transaction envoyée", type: "ok" });
+      setAmount("");
+      setReceiverId("");
+      loadWallet();
+      loadTxs(wallet.id);
+    } catch (e2) {
+      setToast({ text: e2.message, type: "error" });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="shell">
+      <div className="topbar">
+        <div className="wordmark">wali</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
+          <span className="who">Connecté</span>
+          <button onClick={onLogout}>Déconnexion</button>
+        </div>
+      </div>
+
+      <section>
+        <div className="section-head">
+          <h2>Solde</h2>
+          <button className="refresh" onClick={loadWallet}>Actualiser</button>
+        </div>
+        <div className="balance-block">
+          {loadingWallet ? (
+            <div className="empty">Chargement…</div>
+          ) : wallet ? (
+            <React.Fragment>
+              <span className="balance-num">{Number(wallet.balance).toLocaleString("fr-FR")}</span>
+              <span className="balance-currency">XOF</span>
+              <div className="wallet-id">Portefeuille {wallet.id}</div>
+            </React.Fragment>
+          ) : (
+            <div className="empty">Portefeuille introuvable</div>
+          )}
+        </div>
+      </section>
+
+      <section>
+        <div className="section-head"><h2>Nouvelle transaction</h2></div>
+        <form className="tx-form" onSubmit={submitTx}>
+          <div className="type-toggle">
+            <button type="button"
+              className={"type-btn" + (txType === "DEPOSIT" ? " active" : "")}
+              onClick={() => setTxType("DEPOSIT")}>Dépôt</button>
+            <button type="button"
+              className={"type-btn" + (txType === "TRANSFER" ? " active" : "")}
+              onClick={() => setTxType("TRANSFER")}>Transfert</button>
+          </div>
+          <div className="row2">
+            <div className="field" style={{ marginBottom: 0 }}>
+              <label>Montant (XOF)</label>
+              <input type="number" min="1" step="1" value={amount}
+                onChange={e => setAmount(e.target.value)} required />
+            </div>
+            {txType === "TRANSFER" && (
+              <div className="field" style={{ marginBottom: 0 }}>
+                <label>Portefeuille destinataire</label>
+                <input value={receiverId} onChange={e => setReceiverId(e.target.value)} required />
+              </div>
+            )}
+          </div>
+          <button className="btn" disabled={sending || !wallet}>
+            {sending ? "Envoi…" : "Envoyer"}
+          </button>
+        </form>
+      </section>
+
+      <section>
+        <div className="section-head">
+          <h2>Registre des transactions</h2>
+          <button className="refresh" onClick={() => wallet && loadTxs(wallet.id)}>Actualiser</button>
+        </div>
+        {txs.length === 0 ? (
+          <div className="empty">Aucune transaction pour l'instant.</div>
+        ) : (
+          txs.map(tx => (
+            <div className="ledger-row" key={tx.id}>
+              <div className="ledger-left">
+                <span className="ledger-type">{tx.type === "DEPOSIT" ? "Dépôt" : "Transfert"}</span>
+                <span className="ledger-date">{new Date(tx.createdAt).toLocaleString("fr-FR")}</span>
+              </div>
+              <div className="ledger-right">
+                <span className={"status-pill status-" + tx.status}>{tx.status}</span>
+                <span className="ledger-amount">{Number(tx.amount).toLocaleString("fr-FR")} XOF</span>
+              </div>
+            </div>
+          ))
+        )}
+      </section>
+
+      <section>
+        <div className="section-head">
+          <h2>Notifications</h2>
+          <button className="refresh" onClick={() => wallet && loadNotifs(wallet.id)}>Actualiser</button>
+        </div>
+        {notifs.length === 0 ? (
+          <div className="empty">Aucune notification.</div>
+        ) : (
+          notifs.map(n => (
+            <div className="notif-row" key={n.id}>
+              <div className="notif-title">{n.title}</div>
+              <div className="notif-body">{n.body}</div>
+              <div className="notif-date">{new Date(n.createdAt).toLocaleString("fr-FR")}</div>
+            </div>
+          ))
+        )}
+      </section>
+    </div>
+  );
+}
+
+function App() {
+  const [session, setSession] = useState(() => {
+    const raw = localStorage.getItem("wali_session");
+    return raw ? JSON.parse(raw) : null;
+  });
+  const [toast, setToastRaw] = useState(null);
+
+  const setToast = (t) => {
+    setToastRaw(t);
+    if (t) setTimeout(() => setToastRaw(null), 2800);
+  };
+
+  const onAuthed = (s) => {
+    localStorage.setItem("wali_session", JSON.stringify(s));
+    setSession(s);
+  };
+  const onLogout = () => {
+    localStorage.removeItem("wali_session");
+    setSession(null);
+  };
+
+  return (
+    <React.Fragment>
+      {session ? (
+        <Dashboard session={session} onLogout={onLogout} setToast={setToast} />
+      ) : (
+        <AuthScreen onAuthed={onAuthed} setToast={setToast} />
+      )}
+      <Toast toast={toast} />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
