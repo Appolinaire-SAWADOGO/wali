@@ -17,7 +17,7 @@ spec:
       containers:
         - name: wali-notification-service
           image: 08072005/wali-notification-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

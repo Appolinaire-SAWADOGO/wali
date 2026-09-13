@@ -2,8 +2,10 @@ package com.wali.auth_service.controller;
 
 import com.wali.auth_service.Request.AuthRegisterRequest;
 import com.wali.auth_service.Request.AuthLoginRequest;
+import com.wali.auth_service.dto.response.UserResponseDto;
 import com.wali.auth_service.entities.UserEntity;
 import com.wali.auth_service.exceptions.UserAlreadyExistsException;
+import com.wali.auth_service.exceptions.UserNotFoundException;
 import com.wali.auth_service.response.AuthResponse;
 import com.wali.auth_service.security.jwt.JwtTokenUtil;
 import com.wali.auth_service.services.user.UserService;
@@ -16,10 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -103,5 +102,28 @@ public class AuthController {
                             AuthResponse.builder().message("Internal Error").build()
                     );
         }
+    }
+
+    @GetMapping("/user/{id}")
+    private ResponseEntity<AuthResponse> getUser(@PathVariable String id) {
+        log.info("Getting user for userId={}", id);
+
+        try {
+            UserResponseDto userResponseDto = userService.getUserById(id);
+
+            log.info("User found successfully for userId={}", id);
+
+            return ResponseEntity.status(HttpStatus.OK).body(AuthResponse.builder()
+                    .data(userResponseDto)
+                    .build());
+        }catch (UserNotFoundException e) {
+            log.warn("User not found for userId={}", id);
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    AuthResponse.builder()
+                            .message("User not found")
+                            .build());
+        }
+
     }
 }

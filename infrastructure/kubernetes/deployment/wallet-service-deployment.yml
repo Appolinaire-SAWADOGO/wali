@@ -17,7 +17,7 @@ spec:
       containers:
         - name: wali-wallet-service
           image: 08072005/wali-wallet-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
